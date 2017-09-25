@@ -14,6 +14,7 @@ let package = Package(
         Target(name: "ContentfulSyncSerializer")
     ],
     dependencies: [
+      .Package(url: "https://github.com/kylef/Commander", Version(0, 6, 1)),
       .Package(url: "https://github.com/contentful/contentful-persistence.swift", Version(0, 6, 1)),
       .Package(url: "https://github.com/johnsundell/files.git", majorVersion: 1)
     ]

@@ -15,29 +15,35 @@ import CoreLocation
 // https://medium.com/@johnsundell/building-a-command-line-tool-using-the-swift-package-manager-3dd96ce360b1
 public final class SyncJSONDownloader: DataDelegate {
 
-    private let arguments: [String]
 
-    public let writingDirectoryPath: String
+    private let spaceId: String
+    private let accessToken: String
+    private let outputDirectoryPath: String
 
-    public init(arguments: [String]) {
-        self.arguments = arguments
-        writingDirectoryPath = arguments[3]
+//    public let writingDirectoryPath: String
+
+    public init(spaceId: String, accessToken: String, outputDirectoryPath: String) {
+        self.spaceId = spaceId
+        self.accessToken = accessToken
+        self.outputDirectoryPath = outputDirectoryPath
+
+//        writingDirectoryPath = arguments[3]
         syncGroup = DispatchGroup()
     }
 
     public func run(then completion: @escaping (Result<Bool>) -> Void) {
-        guard arguments.count == 4 else {
-            completion(Result.error(Error.invalidArguments))
-            return
-        }
+//        guard arguments.count == 4 else {
+//            completion(Result.error(Error.invalidArguments))
+//            return
+//        }
 
         var clientConfiguration = ClientConfiguration()
         clientConfiguration.dataDelegate = self
-        let client = Client(spaceId: arguments[1],
-                            accessToken: arguments[2],
+        let client = Client(spaceId: spaceId,
+                            accessToken: accessToken,
                             clientConfiguration: clientConfiguration)
 
-        print("Writing sync JSON files to directory \(writingDirectoryPath)")
+        print("Writing sync JSON files to directory \(outputDirectoryPath)")
 
         client.initialSync { [weak self] (result: Result<SyncSpace>) in
             guard let syncSpace = result.value else {
@@ -90,7 +96,7 @@ public final class SyncJSONDownloader: DataDelegate {
         }
 
 
-        guard let directoryURL = Foundation.URL(string: writingDirectoryPath) else {
+        guard let directoryURL = Foundation.URL(string: outputDirectoryPath) else {
             throw SDKError.invalidClient()
         }
 
@@ -114,9 +120,9 @@ public final class SyncJSONDownloader: DataDelegate {
 
         switch fetchURLComponents.path {
         // Write the space to disk.
-        case "/spaces/\(arguments[1])/":
+        case "/spaces/\(spaceId)/":
             writeJSONDataToDisk(data, withFileName: "space")
-        case "/spaces/\(arguments[1])/sync":
+        case "/spaces/\(spaceId)/sync":
             guard let fetchQueryItems = fetchURLComponents.queryItems else { return }
 
             for queryItem in fetchQueryItems {
@@ -137,7 +143,7 @@ public final class SyncJSONDownloader: DataDelegate {
 
     private func writeJSONDataToDisk(_ data: Data, withFileName fileName: String) {
 
-        let directoryURL = Foundation.URL(string: writingDirectoryPath)!
+        let directoryURL = Foundation.URL(string: outputDirectoryPath)!
 
         let filePath = directoryURL.appendingPathComponent(fileName)
         let fullPath = filePath.appendingPathExtension("json")

@@ -33,8 +33,9 @@ class ContentfulSyncSerializerTests: XCTestCase {
             fileManager.changeCurrentDirectoryPath(testFolder.path)
 
             // Uses Complex Sync Test Space to check mulitpage sync. First argument is always working directory.
-            let arguments = [testFolder.path, "smf0sqiu0c5s", "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34", testFolder.path]
-            let syncJSONDowloader = SyncJSONDownloader(arguments: arguments)
+            let syncJSONDowloader = SyncJSONDownloader(spaceId: "smf0sqiu0c5s",
+                                                       accessToken: "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34",
+                                                       outputDirectoryPath: testFolder.path)
 
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
@@ -75,7 +76,9 @@ class ContentfulSyncSerializerTests: XCTestCase {
 
             // Uses Complex Sync Test Space.
             let arguments = [testFolder.path, "cfexampleapi", "b4c0n73n7fu1", testFolder.path]
-            let syncJSONDowloader = SyncJSONDownloader(arguments: arguments)
+            let syncJSONDowloader = SyncJSONDownloader(spaceId: "cfexampleapi",
+                                                       accessToken: "b4c0n73n7fu1",
+                                                       outputDirectoryPath: testFolder.path)
 
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
