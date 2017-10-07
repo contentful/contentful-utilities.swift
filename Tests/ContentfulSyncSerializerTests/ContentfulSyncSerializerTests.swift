@@ -11,7 +11,6 @@ import XCTest
 import Interstellar
 import Foundation
 import Files
-import CoreLocation // Bug to be fixed soon.
 
 
 class ContentfulSyncSerializerTests: XCTestCase {
@@ -75,7 +74,6 @@ class ContentfulSyncSerializerTests: XCTestCase {
             fileManager.changeCurrentDirectoryPath(testFolder.path)
 
             // Uses Complex Sync Test Space.
-            let arguments = [testFolder.path, "cfexampleapi", "b4c0n73n7fu1", testFolder.path]
             let syncJSONDowloader = SyncJSONDownloader(spaceId: "cfexampleapi",
                                                        accessToken: "b4c0n73n7fu1",
                                                        outputDirectoryPath: testFolder.path)

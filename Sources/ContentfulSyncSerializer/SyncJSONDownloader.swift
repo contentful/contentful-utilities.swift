@@ -10,7 +10,6 @@ import Foundation
 import Interstellar
 import Contentful
 import ContentfulPersistence
-import CoreLocation
 
 // https://medium.com/@johnsundell/building-a-command-line-tool-using-the-swift-package-manager-3dd96ce360b1
 public final class SyncJSONDownloader: DataDelegate {
@@ -20,22 +19,15 @@ public final class SyncJSONDownloader: DataDelegate {
     private let accessToken: String
     private let outputDirectoryPath: String
 
-//    public let writingDirectoryPath: String
-
     public init(spaceId: String, accessToken: String, outputDirectoryPath: String) {
         self.spaceId = spaceId
         self.accessToken = accessToken
         self.outputDirectoryPath = outputDirectoryPath
 
-//        writingDirectoryPath = arguments[3]
         syncGroup = DispatchGroup()
     }
 
     public func run(then completion: @escaping (Result<Bool>) -> Void) {
-//        guard arguments.count == 4 else {
-//            completion(Result.error(Error.invalidArguments))
-//            return
-//        }
 
         var clientConfiguration = ClientConfiguration()
         clientConfiguration.dataDelegate = self
@@ -77,7 +69,7 @@ public final class SyncJSONDownloader: DataDelegate {
                 }
             }
             // Execute after all tasks have finished.
-            self?.syncGroup.notify(queue: DispatchQueue.main) { _ in
+            self?.syncGroup.notify(queue: DispatchQueue.main) { 
                 guard imageSaveErrorCount == 0 else {
                     completion(Result.error(SyncJSONDownloader.Error.failedToWriteFiles(imageSaveErrorCount)))
                     return

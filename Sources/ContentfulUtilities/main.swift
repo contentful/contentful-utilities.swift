@@ -11,7 +11,6 @@
 import Foundation
 import Interstellar
 import ContentfulSyncSerializer
-import CoreLocation
 import Commander
 
 

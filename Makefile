@@ -1,10 +1,12 @@
 
+.PHONY: install release test clean open
 
-.PHONY: install release test
-
+open:
+	open ContentfulUtilities.xcodeproj
 
 clean:
 	swift package clean
+	rm -rf .build
 	rm -rf ~/Library/Developer/Xcode/DerivedData
 
 install:
