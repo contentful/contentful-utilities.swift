@@ -15,17 +15,17 @@
         "repositoryURL": "https://github.com/contentful/contentful.swift",
         "state": {
           "branch": null,
-          "revision": "808d7fcda1365217efcf884678aa97c21a89f37c",
-          "version": "1.0.0-beta2"
+          "revision": "5b9e4e33ce2716a91278ffea7d52cc6991eb7f71",
+          "version": "1.0.0-beta3"
         }
       },
       {
         "package": "ContentfulPersistence",
         "repositoryURL": "https://github.com/contentful/contentful-persistence.swift",
         "state": {
-          "branch": "update-contentful",
-          "revision": "707ae9a1fd856856b0312bbcb06a9584b3932e67",
-          "version": null
+          "branch": null,
+          "revision": "5836e4475beda86ea5bc607cb7beb5ec67a4564a",
+          "version": "0.8.0"
         }
       },
       {

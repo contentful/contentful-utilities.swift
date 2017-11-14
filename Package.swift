@@ -15,8 +15,8 @@ let package = Package(
             targets: ["ContentfulSyncSerializer"])
     ],
     dependencies: [
-      .package(url: "https://github.com/contentful/contentful-persistence.swift", .branch("update-contentful")),
-      .package(url: "https://github.com/contentful/contentful.swift", .upToNextMinor(from: "1.0.0-beta2")),
+      .package(url: "https://github.com/contentful/contentful-persistence.swift", .upToNextMinor(from: "0.8.0")),
+      .package(url: "https://github.com/contentful/contentful.swift", .upToNextMinor(from: "1.0.0-beta3")),
       .package(url: "https://github.com/jensravens/Interstellar", .upToNextMinor(from: "2.1.0")),
       .package(url: "https://github.com/kylef/Commander", .upToNextMinor(from: "0.8.0")),
       .package(url: "https://github.com/johnsundell/files.git", .upToNextMajor(from: "1.12.0"))
@@ -33,7 +33,7 @@ let package = Package(
         .target(
             name: "ContentfulSyncSerializer",
             dependencies: [
-                .product(name: "ContentfulPersistence"),
+                "ContentfulPersistence",
                 "Contentful",
                 "Interstellar"
             ]
