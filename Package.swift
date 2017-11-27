@@ -19,7 +19,7 @@ let package = Package(
       .package(url: "https://github.com/contentful/contentful.swift", .upToNextMinor(from: "1.0.0-beta3")),
       .package(url: "https://github.com/jensravens/Interstellar", .upToNextMinor(from: "2.1.0")),
       .package(url: "https://github.com/kylef/Commander", .upToNextMinor(from: "0.8.0")),
-      .package(url: "https://github.com/johnsundell/files.git", .upToNextMajor(from: "1.12.0"))
+      .package(url: "https://github.com/johnsundell/files.git", .upToNextMajor(from: "2.0.1"))
     ],
     targets: [
         .target(
