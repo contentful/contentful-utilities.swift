@@ -1,0 +1,61 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Commander",
+        "repositoryURL": "https://github.com/kylef/Commander",
+        "state": {
+          "branch": null,
+          "revision": "e5b50ad7b2e91eeb828393e89b03577b16be7db9",
+          "version": "0.8.0"
+        }
+      },
+      {
+        "package": "Contentful",
+        "repositoryURL": "https://github.com/contentful/contentful.swift",
+        "state": {
+          "branch": null,
+          "revision": "5b9e4e33ce2716a91278ffea7d52cc6991eb7f71",
+          "version": "1.0.0-beta3"
+        }
+      },
+      {
+        "package": "ContentfulPersistence",
+        "repositoryURL": "https://github.com/contentful/contentful-persistence.swift",
+        "state": {
+          "branch": null,
+          "revision": "5836e4475beda86ea5bc607cb7beb5ec67a4564a",
+          "version": "0.8.0"
+        }
+      },
+      {
+        "package": "Files",
+        "repositoryURL": "https://github.com/johnsundell/files.git",
+        "state": {
+          "branch": null,
+          "revision": "6171f9e9d8619678da22355560f3dbed6368058d",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "Interstellar",
+        "repositoryURL": "https://github.com/jensravens/Interstellar",
+        "state": {
+          "branch": null,
+          "revision": "5fb8f1f2b7d869380555cca5f44a8cfdca390633",
+          "version": "2.1.0"
+        }
+      },
+      {
+        "package": "Spectre",
+        "repositoryURL": "https://github.com/kylef/Spectre.git",
+        "state": {
+          "branch": null,
+          "revision": "e34d5687e1e9d865e3527dd58bc2f7464ef6d936",
+          "version": "0.8.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
