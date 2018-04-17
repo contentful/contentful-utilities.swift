@@ -16,9 +16,9 @@ import Commander
 
 // Initialize commands.
 let bundleSyncCommand = command(
-    Argument<String>("spaceId", description: "The identifier for your Contentful space"),
-    Argument<String>("accessToken", description: "Your content delivery API access token"),
-    Argument<String>("output", description: "The path to the directory for your output")
+    Option<String>("spaceId", default: "", description: "The identifier for your Contentful space"),
+    Option<String>("accessToken", default: "", description: "Your content delivery API access token"),
+    Option<String>("output", default: "", description: "The path to the directory for your output")
 ) { (spaceId: String, accessToken: String, output: String) in
 
     let syncJSONDownloader = SyncJSONDownloader(spaceId: spaceId, accessToken: accessToken, outputDirectoryPath: output)
