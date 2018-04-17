@@ -16,12 +16,16 @@ import Commander
 
 // Initialize commands.
 let bundleSyncCommand = command(
-    Option<String>("spaceId", default: "", description: "The identifier for your Contentful space"),
-    Option<String>("accessToken", default: "", description: "Your content delivery API access token"),
-    Option<String>("output", default: "", description: "The path to the directory for your output")
-) { (spaceId: String, accessToken: String, output: String) in
+    Option<String>("space-id", default: "", description: "The identifier for your Contentful space"),
+    Option<String>("access-token", default: "", description: "Your content delivery API access token"),
+    Option<String>("output", default: "", description: "The path to the directory for your output"),
+    Flag("download-asset-data", default: false, description: "If true, downloads the binary media files as well")
+) { (spaceId: String, accessToken: String, output: String, shouldDownloadMediaFiles: Bool) in
 
-    let syncJSONDownloader = SyncJSONDownloader(spaceId: spaceId, accessToken: accessToken, outputDirectoryPath: output)
+    let syncJSONDownloader = SyncJSONDownloader(spaceId: spaceId,
+                                                accessToken: accessToken,
+                                                outputDirectoryPath: output,
+                                                shouldDownloadMediaFiles: shouldDownloadMediaFiles)
 
     syncJSONDownloader.run { result in
         switch result {
