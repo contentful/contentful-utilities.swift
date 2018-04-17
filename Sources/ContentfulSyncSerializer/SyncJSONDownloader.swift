@@ -37,7 +37,7 @@ public final class SyncJSONDownloader: DataDelegate {
 
         print("Writing sync JSON files to directory \(outputDirectoryPath)")
 
-        client.initialSync { [weak self] (result: Result<SyncSpace>) in
+        client.sync { [weak self] (result: Result<SyncSpace>) in
             guard let syncSpace = result.value else {
                 completion(Result.error(Error.failedToCreateFile))
                 return
@@ -112,8 +112,8 @@ public final class SyncJSONDownloader: DataDelegate {
 
         switch fetchURLComponents.path {
         // Write the space to disk.
-        case "/spaces/\(spaceId)/":
-            writeJSONDataToDisk(data, withFileName: "space")
+        case "/spaces/\(spaceId)/environments/master/locales":
+            writeJSONDataToDisk(data, withFileName: "locales")
         case "/spaces/\(spaceId)/sync":
             guard let fetchQueryItems = fetchURLComponents.queryItems else { return }
 

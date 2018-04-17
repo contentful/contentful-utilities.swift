@@ -44,7 +44,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
                     expectation.fulfill()
                     return
                 }
-                XCTAssertNotNil(try? testFolder.file(named: "space.json"))
+                XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "0.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "1.json"))
 
@@ -86,7 +86,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
                     expectation.fulfill()
                     return
                 }
-                XCTAssertNotNil(try? testFolder.file(named: "space.json"))
+                XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "0.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "cache_1x0xpXu4pSGS4OukSyWGUK.jpg"))
                 XCTAssertNotNil(try? testFolder.file(named: "cache_happycat.jpg"))
