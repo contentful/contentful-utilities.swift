@@ -25,6 +25,27 @@ cd .build/release
 cp -f ContentfulUtilties /usr/local/bin/contentful-utilities
 ```
 
+## Usage
+
+There are three required arguments and one optional argument. The following command will download all the JSON data from your space to the specified output directory:
+
+```bash
+contentful-utilities sync-to-bundle --space-id "cfexampleapi" --access-token "b4c0n73n7fu1" --output .
+```
+
+If you additionally want to download the binary data for all your assets, you can add the `--download-asset-data` flag.
+
+## Next steps
+
+Add the downloaded files to your iOS project's bundle and use the following methods from the [contentful-persistence.swift][3] library seed a CoreData database on first launch (note that you are responsible for implementing your own logic for detecting first launch). See [this](https://github.com/contentful/contentful-persistence.swift/blob/master/Sources/ContentfulPersistence/SynchronizationManager%2BSeedDB.swift) file for more detail
+
+```swift
+public func seedDBFromJSONFiles(in directory: String, in bundle: Bundle) throws
+
+static func bundledData(for media: AssetProtocol, inDirectoryNamed directory: String, in bundle: Bundle) -> Data?
+```
+
+
 ## License
 
 Copyright (c) 2016 Contentful GmbH. See LICENSE for further details.
