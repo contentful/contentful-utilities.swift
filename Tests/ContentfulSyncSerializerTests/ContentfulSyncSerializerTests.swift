@@ -34,7 +34,8 @@ class ContentfulSyncSerializerTests: XCTestCase {
             // Uses Complex Sync Test Space to check mulitpage sync. First argument is always working directory.
             let syncJSONDowloader = SyncJSONDownloader(spaceId: "smf0sqiu0c5s",
                                                        accessToken: "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34",
-                                                       outputDirectoryPath: testFolder.path)
+                                                       outputDirectoryPath: testFolder.path,
+                                                       shouldDownloadMediaFiles: false)
 
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
@@ -44,7 +45,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
                     expectation.fulfill()
                     return
                 }
-                XCTAssertNotNil(try? testFolder.file(named: "space.json"))
+                XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "0.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "1.json"))
 
@@ -76,7 +77,8 @@ class ContentfulSyncSerializerTests: XCTestCase {
             // Uses Complex Sync Test Space.
             let syncJSONDowloader = SyncJSONDownloader(spaceId: "cfexampleapi",
                                                        accessToken: "b4c0n73n7fu1",
-                                                       outputDirectoryPath: testFolder.path)
+                                                       outputDirectoryPath: testFolder.path,
+                                                       shouldDownloadMediaFiles: true)
 
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
@@ -86,7 +88,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
                     expectation.fulfill()
                     return
                 }
-                XCTAssertNotNil(try? testFolder.file(named: "space.json"))
+                XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "0.json"))
                 XCTAssertNotNil(try? testFolder.file(named: "cache_1x0xpXu4pSGS4OukSyWGUK.jpg"))
                 XCTAssertNotNil(try? testFolder.file(named: "cache_happycat.jpg"))

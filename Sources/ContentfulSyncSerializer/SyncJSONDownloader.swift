@@ -18,11 +18,13 @@ public final class SyncJSONDownloader: DataDelegate {
     private let spaceId: String
     private let accessToken: String
     private let outputDirectoryPath: String
+    private let shouldDownloadMediaFiles: Bool
 
-    public init(spaceId: String, accessToken: String, outputDirectoryPath: String) {
+    public init(spaceId: String, accessToken: String, outputDirectoryPath: String, shouldDownloadMediaFiles: Bool) {
         self.spaceId = spaceId
         self.accessToken = accessToken
         self.outputDirectoryPath = outputDirectoryPath
+        self.shouldDownloadMediaFiles = shouldDownloadMediaFiles
 
         syncGroup = DispatchGroup()
     }
@@ -37,31 +39,27 @@ public final class SyncJSONDownloader: DataDelegate {
 
         print("Writing sync JSON files to directory \(outputDirectoryPath)")
 
-        client.initialSync { [weak self] (result: Result<SyncSpace>) in
-            guard let syncSpace = result.value else {
-                completion(Result.error(Error.failedToCreateFile))
+        client.sync { [unowned self] (result: Result<SyncSpace>) in
+            guard let syncSpace = result.value, result.error == nil else {
+                completion(Result.error(result.error!))
                 return
             }
-            guard syncSpace.assets.count > 0 else {
+            guard self.shouldDownloadMediaFiles && syncSpace.assets.count > 0 else {
                 completion(Result.success(true))
                 return
             }
             var imageSaveErrorCount = 0
             for asset in syncSpace.assets {
 
-                self?.syncGroup.enter()
+                self.syncGroup.enter()
                 client.fetchData(for: asset).then { data in
-                    guard let strongSelf = self else {
-                        completion(Result.error(SDKError.invalidClient()))
-                        return
-                    }
                     do {
-                        try strongSelf.saveData(data, for: asset)
-                        strongSelf.syncGroup.leave()
+                        try self.saveData(data, for: asset)
+                        self.syncGroup.leave()
                     } catch {
                         // TODO: Log error
                         imageSaveErrorCount += 1
-                        strongSelf.syncGroup.leave()
+                        self.syncGroup.leave()
                     }
 
                 }.error { error in
@@ -69,7 +67,7 @@ public final class SyncJSONDownloader: DataDelegate {
                 }
             }
             // Execute after all tasks have finished.
-            self?.syncGroup.notify(queue: DispatchQueue.main) { 
+            self.syncGroup.notify(queue: DispatchQueue.main) {
                 guard imageSaveErrorCount == 0 else {
                     completion(Result.error(SyncJSONDownloader.Error.failedToWriteFiles(imageSaveErrorCount)))
                     return
@@ -112,8 +110,8 @@ public final class SyncJSONDownloader: DataDelegate {
 
         switch fetchURLComponents.path {
         // Write the space to disk.
-        case "/spaces/\(spaceId)/":
-            writeJSONDataToDisk(data, withFileName: "space")
+        case "/spaces/\(spaceId)/environments/master/locales":
+            writeJSONDataToDisk(data, withFileName: "locales")
         case "/spaces/\(spaceId)/sync":
             guard let fetchQueryItems = fetchURLComponents.queryItems else { return }
 

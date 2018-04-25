@@ -11,21 +11,21 @@
         }
       },
       {
-        "package": "Contentful",
-        "repositoryURL": "https://github.com/contentful/contentful.swift",
-        "state": {
-          "branch": null,
-          "revision": "5b9e4e33ce2716a91278ffea7d52cc6991eb7f71",
-          "version": "1.0.0-beta3"
-        }
-      },
-      {
         "package": "ContentfulPersistence",
         "repositoryURL": "https://github.com/contentful/contentful-persistence.swift",
         "state": {
           "branch": null,
-          "revision": "5836e4475beda86ea5bc607cb7beb5ec67a4564a",
-          "version": "0.8.0"
+          "revision": "3283dd2908fda5554a1b3ebab4708dd026e00eae",
+          "version": "0.11.0"
+        }
+      },
+      {
+        "package": "Contentful",
+        "repositoryURL": "https://github.com/contentful/contentful.swift",
+        "state": {
+          "branch": null,
+          "revision": "ba493986fff8b8bbd9dd4f3e56f074904c090ab6",
+          "version": "2.0.0"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/johnsundell/files.git",
         "state": {
           "branch": null,
-          "revision": "6171f9e9d8619678da22355560f3dbed6368058d",
-          "version": "2.0.1"
+          "revision": "06f95bd1bf4f8d5f50bc6bb30b808c253acd4c88",
+          "version": "2.2.1"
         }
       },
       {
