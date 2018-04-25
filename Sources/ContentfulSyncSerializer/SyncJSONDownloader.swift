@@ -40,8 +40,8 @@ public final class SyncJSONDownloader: DataDelegate {
         print("Writing sync JSON files to directory \(outputDirectoryPath)")
 
         client.sync { [unowned self] (result: Result<SyncSpace>) in
-            guard let syncSpace = result.value else {
-                completion(Result.error(Error.failedToCreateFile))
+            guard let syncSpace = result.value, result.error == nil else {
+                completion(Result.error(result.error!))
                 return
             }
             guard self.shouldDownloadMediaFiles && syncSpace.assets.count > 0 else {
