@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/contentful/contentful-persistence.swift",
         "state": {
           "branch": null,
-          "revision": "4f8b5d314acbda59e9f6a439cad56ce673d66f40",
-          "version": "0.10.0"
+          "revision": "3283dd2908fda5554a1b3ebab4708dd026e00eae",
+          "version": "0.11.0"
         }
       },
       {
