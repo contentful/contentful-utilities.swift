@@ -17,10 +17,9 @@ public final class ContentTypeCodeGenerator {
 //    }
 
     public func run(then completion: @escaping (Result<Bool>) -> Void) {
-        let trailingSpaceTrivia = Trivia(pieces: [.spaces(1)])
+
         let classKeyword = SyntaxFactory.makeClassKeyword(leadingTrivia: Trivia(pieces: [TriviaPiece.newlines(0)]),
                                                           trailingTrivia: trailingSpaceTrivia)
-
 
         let klass = ClassDeclSyntax { builder in
             builder.useClassKeyword(classKeyword)
@@ -29,24 +28,47 @@ public final class ContentTypeCodeGenerator {
             let inheritanceCollection = SyntaxFactory.makeInheritedTypeList([entryDecodableTypeSyntax(), entryQueryableTypeSyntax()])
             let inheritanceClauses = SyntaxFactory.makeTypeInheritanceClause(colon: SyntaxFactory.makeColonToken(), inheritedTypeCollection: inheritanceCollection)
             builder.useInheritanceClause(inheritanceClauses)
+
             let members = MemberDeclBlockSyntax { memberBuilder in
-                memberBuilder.useLeftBrace(SyntaxFactory.makeLeftBraceToken())
-                let variableName = SyntaxFactory.makeIdentifierPattern(identifier: SyntaxFactory.makeUnknown("name"))
-                let typeName = SyntaxFactory.makeTypeAnnotation(colon: SyntaxFactory.makeColonToken(), type: SyntaxFactory.makeTypeIdentifier("String"))
-                SyntaxFactory.makePatternBinding(pattern: SyntaxFactory.makeUnknown("Cat"), typeAnnotation: TypeAnnotationSyntax(, initializer: <#T##InitializerClauseSyntax?#>, accessor: <#T##AccessorBlockSyntax?#>, trailingComma: <#T##TokenSyntax?#>)
-                SyntaxFactory.makePatternBindingList(<#T##elements: [PatternBindingSyntax]##[PatternBindingSyntax]#>)
-                memberBuilder.addDecl(SyntaxFactory.makeVariableDecl(attributes: nil, modifiers: nil, letOrVarKeyword: SyntaxFactory.makeLetKeyword(), bindings: PatternBindingListSyntax ))
+
+                memberBuilder.useLeftBrace(SyntaxFactory.makeLeftBraceToken().withLeadingTrivia(trailingSpaceTrivia))
                 memberBuilder.useRightBrace(SyntaxFactory.makeRightBraceToken())
+
+                let typeAnnotation = TypeAnnotationSyntax { typeBuilder in
+                    typeBuilder.useType(SyntaxFactory.makeTypeIdentifier("String"))
+                    typeBuilder.useColon(SyntaxFactory.makeColonToken().withTrailingTrivia(trailingSpaceTrivia))
+                }
+                let patternBinding = SyntaxFactory.makePatternBindingList([PatternBindingSyntax { builder in
+                    builder.useTypeAnnotation(typeAnnotation)
+                }])
+
+                let decl = SyntaxFactory.makeVariableDecl(attributes: nil,
+                                                          modifiers: nil,
+                                                          letOrVarKeyword: SyntaxFactory.makeLetKeyword(),
+                                                          bindings: patternBinding)
+                SyntaxFactory.make
+
+                memberBuilder.addDecl(decl)
             }
+
             builder.useMembers(members)
         }
-        print(klass.description)
+        
+        print("""
+
+        \(klass.description)
+
+        """)
+    }
+
+    var trailingSpaceTrivia: Trivia {
+        return Trivia(pieces: [.spaces(1)])
     }
 
     func entryDecodableTypeSyntax() -> InheritedTypeSyntax {
         return InheritedTypeSyntax { builder in
             builder.useTypeName(SyntaxFactory.makeTypeIdentifier("EntryDecodable"))
-            builder.useTrailingComma(SyntaxFactory.makeCommaToken())
+            builder.useTrailingComma(SyntaxFactory.makeCommaToken().withTrailingTrivia(trailingSpaceTrivia))
         }
     }
 
