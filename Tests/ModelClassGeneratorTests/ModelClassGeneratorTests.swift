@@ -14,10 +14,13 @@ import Foundation
 class ModelClassGeneratorTests: XCTestCase {
 
     func testExample() {
+        let expectation = self.expectation(description: "")
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        ContentTypeCodeGenerator().run {_ in 
-            print("done")
+        StencilGenerator().go() { bool in
+            print(bool.description)
+            expectation.fulfill()
         }
+        self.waitForExpectations(timeout: 10.0, handler: nil)
     }
 }
