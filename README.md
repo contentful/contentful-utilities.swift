@@ -1,7 +1,8 @@
-
 # contentful-utilities.swift
 
-Command line utilities to be used in conjunction with Contentful's Swift SDK's and libraries. See [contentful.swift][2] and [contentful-persistence.swift][3].
+> Command line utilities to be used in conjunction with Contentful's Swift SDK's and libraries. See [contentful.swift][2] and [contentful-persistence.swift][3].
+
+**What is Contentful?**
 
 [Contentful][1] provides a content infrastructure for digital teams to power content in websites, apps, and devices. Unlike a CMS, Contentful was built to integrate with the modern software stack. It offers a central hub for structured content, powerful management and delivery APIs, and a customizable web app that enable developers and content creators to ship digital products faster.
 ## Usage
@@ -48,7 +49,7 @@ static func bundledData(for media: AssetProtocol, inDirectoryNamed directory: St
 
 ## License
 
-Copyright (c) 2016 Contentful GmbH. See LICENSE for further details.
+Copyright (c) 2018 Contentful GmbH. See [LICENSE](LICENSE) for further details.
 
 [1]: https://www.contentful.com
 [2]: https://github.com/contentful/contentful.swift
