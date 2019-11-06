@@ -6,14 +6,11 @@
 //  Copyright © 2017 Contentful GmbH. All rights reserved.
 //
 
+import Commander
+import ContentfulSyncSerializer
+import Foundation
 
 // https://stackoverflow.com/a/39086761/4068264 // Important linker flags to get CLI running.
-import Foundation
-import Interstellar
-import ContentfulSyncSerializer
-import Commander
-
-
 // Initialize commands.
 let bundleSyncCommand = command(
     Option<String>("space-id", default: "", description: "The identifier for your Contentful space"),
@@ -33,7 +30,7 @@ let bundleSyncCommand = command(
             print("Successfully stored JSON files for sync operation in directory \(CommandLine.arguments[3])")
             print("Add this directory to your bundle to ensure these files can be used by contentful-persistence.swift")
             exit(0)
-        case .error(let error):
+        case let .error(error):
             print("Oh no! An error occurred: \(error)")
             exit(1)
         }
@@ -42,8 +39,10 @@ let bundleSyncCommand = command(
     RunLoop.current.run()
 }
 
+//
 let commandGroup = Group {
     $0.addCommand("sync-to-bundle", bundleSyncCommand)
 }
-// Entry point.
+
+//// Entry point.
 commandGroup.run()

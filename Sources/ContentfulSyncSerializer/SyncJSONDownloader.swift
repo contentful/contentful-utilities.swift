@@ -6,15 +6,13 @@
 //  Copyright © 2017 Contentful GmbH. All rights reserved.
 //
 
-import Foundation
-import Interstellar
 import Contentful
 import ContentfulPersistence
+import Foundation
 
-// https://medium.com/@johnsundell/building-a-command-line-tool-using-the-swift-package-manager-3dd96ce360b1
-public final class SyncJSONDownloader: DataDelegate {
-
-
+// https://www.swiftbysundell.com/articles/building-a-command-line-tool-using-the-swift-package-manager/
+public final class SyncJSONDownloader {
+    private let syncGroup: DispatchGroup
     private let spaceId: String
     private let accessToken: String
     private let outputDirectoryPath: String
@@ -30,9 +28,8 @@ public final class SyncJSONDownloader: DataDelegate {
     }
 
     public func run(then completion: @escaping (Result<Bool>) -> Void) {
+        let clientConfiguration = ClientConfiguration()
 
-        var clientConfiguration = ClientConfiguration()
-        clientConfiguration.dataDelegate = self
         let client = Client(spaceId: spaceId,
                             accessToken: accessToken,
                             clientConfiguration: clientConfiguration)
@@ -50,21 +47,34 @@ public final class SyncJSONDownloader: DataDelegate {
             }
             var imageSaveErrorCount = 0
             for asset in syncSpace.assets {
-
                 self.syncGroup.enter()
-                client.fetchData(for: asset).then { data in
+                client.fetchData(for: asset) { data in
                     do {
-                        try self.saveData(data, for: asset)
+                        guard let fetched = data.value else {
+                            self.syncGroup.leave()
+                            return
+                        }
+                        try self.saveData(fetched, for: asset)
                         self.syncGroup.leave()
                     } catch {
                         // TODO: Log error
                         imageSaveErrorCount += 1
                         self.syncGroup.leave()
                     }
-
-                }.error { error in
-                    completion(Result.error(error))
                 }
+//                client.fetchData(for: asset).then { data in
+//                    do {
+//                        try self.saveData(data, for: asset)
+//                        self.syncGroup.leave()
+//                    } catch {
+//                        // TODO: Log error
+//                        imageSaveErrorCount += 1
+//                        self.syncGroup.leave()
+//                    }
+//
+//                }.error { error in
+//                    completion(Result.error(error))
+//                }
             }
             // Execute after all tasks have finished.
             self.syncGroup.notify(queue: DispatchQueue.main) {
@@ -77,22 +87,19 @@ public final class SyncJSONDownloader: DataDelegate {
         }
     }
 
-    private let syncGroup: DispatchGroup
-
     private func saveData(_ data: Data, for asset: Asset) throws {
         // FIXME: Break into method on persistent thing.
         guard let fileName = SynchronizationManager.fileName(for: asset) else {
-            throw SDKError.invalidClient()
+            throw SDKError.localeHandlingError(message: "Filename not set")
         }
 
-
         guard let directoryURL = Foundation.URL(string: outputDirectoryPath) else {
-            throw SDKError.invalidClient()
+            throw SDKError.localeHandlingError(message: "Output directory path not exists")
         }
 
         let filePath = directoryURL.appendingPathComponent(fileName)
         guard FileManager.default.createFile(atPath: filePath.absoluteString, contents: data, attributes: nil) else {
-            throw SDKError.invalidClient()
+            throw SDKError.localeHandlingError(message: "Unable to create data at \(filePath.absoluteString)")
         }
     }
 
@@ -132,7 +139,6 @@ public final class SyncJSONDownloader: DataDelegate {
     }
 
     private func writeJSONDataToDisk(_ data: Data, withFileName fileName: String) {
-
         let directoryURL = Foundation.URL(string: outputDirectoryPath)!
 
         let filePath = directoryURL.appendingPathComponent(fileName)
