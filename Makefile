@@ -5,7 +5,6 @@ project:
 	swift package generate-xcodeproj
 open:
 	open ContentfulUtilities.xcodeproj
-
 clean:
 	swift package clean
 	rm -rf .build
