@@ -15,16 +15,17 @@ public final class SyncJSONDownloader {
     private let accessToken: String
     private let outputDirectoryPath: String
     private let shouldDownloadMediaFiles: Bool
-
-    public init(spaceId: String, accessToken: String, outputDirectoryPath: String, shouldDownloadMediaFiles: Bool) {
+    private let environment:String
+    public init(spaceId: String, accessToken: String, outputDirectoryPath: String,environment:String, shouldDownloadMediaFiles: Bool) {
         self.spaceId = spaceId
+        self.environment = environment
         self.accessToken = accessToken
         self.outputDirectoryPath = outputDirectoryPath
         self.shouldDownloadMediaFiles = shouldDownloadMediaFiles
     }
 
     public func run(then completion: @escaping (Contentful.Result<Bool>) -> Void) {
-        let client = Client(spaceId: spaceId,
+        let client = Client(spaceId: spaceId,environmentId: environment,
                             accessToken: accessToken)
 
         client.sync { [unowned self] (result: Contentful.Result<SyncSpace>) in
