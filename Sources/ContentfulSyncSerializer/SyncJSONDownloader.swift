@@ -16,7 +16,7 @@ public final class SyncJSONDownloader {
     private let outputDirectoryPath: String
     private let shouldDownloadMediaFiles: Bool
     private let environment:String
-    public init(spaceId: String, accessToken: String, outputDirectoryPath: String,environment:String, shouldDownloadMediaFiles: Bool) {
+    public init(spaceId: String, accessToken: String, outputDirectoryPath: String,environment:String = "master", shouldDownloadMediaFiles: Bool) {
         self.spaceId = spaceId
         self.environment = environment
         self.accessToken = accessToken
