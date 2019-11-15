@@ -108,7 +108,15 @@ public final class SyncJSONDownloader {
                 return
             }
             self.handleDataFetchedAtURL(data, url: url)
-            completion(Result.success(true))
+            let itinialUrl = client.url(endpoint: .sync, parameters: ["initial":"1"])
+            _ = client.fetch(url: itinialUrl, then: { (initialResult) in
+                guard let data = initialResult.value, initialResult.error == nil else {
+                    completion(Result.error(initialResult.error!))
+                    return
+                }
+                self.handleDataFetchedAtURL(data, url: url)
+                completion(Result.success(true))
+            })
         }
     }
 

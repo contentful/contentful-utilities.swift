@@ -8,7 +8,7 @@ open:
 clean:
 	swift package clean
 	rm -rf .build
-
+	rm -rf ContentfulUtilities.xcodeproj
 install:
 	swift package update
 
