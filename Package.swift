@@ -23,8 +23,11 @@ let package = Package(
         .package(
             url: "https://github.com/johnsundell/files.git",
             from: "4.0.0"
-        )
-
+        ),
+		.package(
+			url: "https://github.com/mxcl/PromiseKit.git",
+			from: "6.8.0"
+		)
     ],
     targets: [
         .target(
@@ -37,7 +40,8 @@ let package = Package(
         .target(
             name: "ContentfulSyncSerializer",
             dependencies: [
-                "ContentfulPersistence"                
+                "ContentfulPersistence",
+				"PromiseKit"
             ]
         ),
         .testTarget(
