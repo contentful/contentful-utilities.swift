@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/contentful/contentful-persistence.swift",
         "state": {
           "branch": null,
-          "revision": "6e671dea7908260296330a4f71095dae44158635",
-          "version": "0.13.0"
+          "revision": "770aca4169fb485ad49c4954d89f8d77c2af903c",
+          "version": "0.14.0"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/contentful/contentful.swift",
         "state": {
           "branch": null,
-          "revision": "17eab50d3d9ea18f9335077eb4d846871c957c12",
-          "version": "4.2.4"
+          "revision": "979528cd5d1ad701c46abef0129705c39ef43570",
+          "version": "5.0.5"
         }
       },
       {
@@ -35,6 +35,15 @@
           "branch": null,
           "revision": "6568bfe636f02dfd85dc9d51b3782555b83080d3",
           "version": "4.0.2"
+        }
+      },
+      {
+        "package": "PromiseKit",
+        "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
+        "state": {
+          "branch": null,
+          "revision": "80963d4317bcdc03891e0fbaa744f20511d1bc08",
+          "version": "6.12.0"
         }
       },
       {
