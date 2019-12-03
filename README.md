@@ -28,12 +28,12 @@ cp -f ContentfulUtilties /usr/local/bin/contentful-utilities
 
 ## Usage
 
-There are three required arguments and one optional argument. The following command will download all the JSON data from your space to the specified output directory:
+There are three required arguments and one optional argument. The following command will download all the JSON data from your space in master environment to the specified output directory:
 
 ```bash
-contentful-utilities sync-to-bundle --space-id "cfexampleapi" --access-token "b4c0n73n7fu1" --output .
+contentful-utilities sync-to-bundle --space-id "cfexampleapi" --access-token "b4c0n73n7fu1" --environment "master" --output .
 ```
-
+If you don't specify `environment` parameter master will be used as default value. 
 If you additionally want to download the binary data for all your assets, you can add the `--download-asset-data` flag.
 
 ## Next steps

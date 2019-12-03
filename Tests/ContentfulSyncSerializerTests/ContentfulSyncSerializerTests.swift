@@ -8,7 +8,6 @@
 
 @testable import ContentfulSyncSerializer
 import XCTest
-import Interstellar
 import Foundation
 import Files
 
@@ -19,8 +18,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
 
         do {
             // Setup a temp test folder that can be used as a sandbox
-            let fileSystem = FileSystem()
-            let tempFolder = fileSystem.temporaryFolder
+            let tempFolder = Folder.temporary
             let testFolder = try tempFolder.createSubfolderIfNeeded(
                 withName: "ContentfulSyncSerializerTests"
             )
@@ -62,8 +60,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
 
         do {
             // Setup a temp test folder that can be used as a sandbox
-            let fileSystem = FileSystem()
-            let tempFolder = fileSystem.temporaryFolder
+            let tempFolder = Folder.temporary
             let testFolder = try tempFolder.createSubfolderIfNeeded(
                 withName: "ContentfulSyncSerializerTests"
             )
@@ -104,3 +101,4 @@ class ContentfulSyncSerializerTests: XCTestCase {
         }
     }
 }
+

@@ -1,5 +1,4 @@
 // swift-tools-version:4.0
-
 import PackageDescription
 
 let package = Package(
@@ -12,40 +11,45 @@ let package = Package(
         .library(
             name: "ContentfulSyncSerializer",
             type: .dynamic,
-            targets: ["ContentfulSyncSerializer"])
+            targets: ["ContentfulSyncSerializer"]),
     ],
     dependencies: [
-      .package(url: "https://github.com/contentful/contentful-persistence.swift", .upToNextMinor(from: "0.11.0")),
-      .package(url: "https://github.com/contentful/contentful.swift", .upToNextMinor(from: "2.0.0")),
-      .package(url: "https://github.com/jensravens/Interstellar", .upToNextMinor(from: "2.1.0")),
-      .package(url: "https://github.com/kylef/Commander", .upToNextMinor(from: "0.8.0")),
-      .package(url: "https://github.com/johnsundell/files.git", .upToNextMajor(from: "2.2.1"))
+        .package(
+            url: "https://github.com/contentful/contentful-persistence.swift",
+            .upToNextMajor(from: "0.13.0")),
+        .package(
+            url: "https://github.com/kylef/Commander",
+            .upToNextMajor(from: "0.9.1")),
+        .package(
+            url: "https://github.com/johnsundell/files.git",
+            from: "4.0.0"
+        ),
+		.package(
+			url: "https://github.com/mxcl/PromiseKit.git",
+			from: "6.8.0"
+		)
     ],
     targets: [
         .target(
             name: "ContentfulUtilities",
             dependencies: [
                 "ContentfulSyncSerializer",
-                "Commander",
-                "Interstellar"
+                "Commander"
             ]
         ),
         .target(
             name: "ContentfulSyncSerializer",
             dependencies: [
                 "ContentfulPersistence",
-                "Contentful",
-                "Interstellar"
+				"PromiseKit"
             ]
         ),
         .testTarget(
             name: "ContentfulSyncSerializerTests",
             dependencies: [
                 "ContentfulSyncSerializer",
-                "Files", 
-                "Interstellar"
+                "Files"
             ]
-        )
+        ),
     ]
 )
-

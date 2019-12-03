@@ -6,97 +6,143 @@
 //  Copyright © 2017 Contentful GmbH. All rights reserved.
 //
 
-import Foundation
-import Interstellar
 import Contentful
 import ContentfulPersistence
-
-// https://medium.com/@johnsundell/building-a-command-line-tool-using-the-swift-package-manager-3dd96ce360b1
-public final class SyncJSONDownloader: DataDelegate {
-
-
+import Foundation
+import PromiseKit
+public final class SyncJSONDownloader {
     private let spaceId: String
     private let accessToken: String
     private let outputDirectoryPath: String
     private let shouldDownloadMediaFiles: Bool
-
-    public init(spaceId: String, accessToken: String, outputDirectoryPath: String, shouldDownloadMediaFiles: Bool) {
+    private let environment: String
+    public init(spaceId: String, accessToken: String, outputDirectoryPath: String, environment: String = "master", shouldDownloadMediaFiles: Bool) {
         self.spaceId = spaceId
+        self.environment = environment
         self.accessToken = accessToken
         self.outputDirectoryPath = outputDirectoryPath
         self.shouldDownloadMediaFiles = shouldDownloadMediaFiles
-
-        syncGroup = DispatchGroup()
     }
 
-    public func run(then completion: @escaping (Result<Bool>) -> Void) {
+    public func run(then completion: @escaping (Contentful.Result<Bool>) -> Void) {
+        let client = Client(spaceId: spaceId, environmentId: environment,
+                            accessToken: accessToken)
+        firstly {
+            sync(client: client)
+        }.then { syncSpace in
+            self.fetchLocales(withClient: client).map({ syncSpace })
+        }.then { syncSpace in
+            self.fetchSync(withClient: client, syncSpace: syncSpace).map({ syncSpace })
+        }.then { syncSpace in
+            self.fetchAssets(withClient: client, syncSpace: syncSpace)
+        }.done { _ in
+            completion(Result.success(true))
+        }.catch { error in
+            completion(.error(error))
+        }
+    }
 
-        var clientConfiguration = ClientConfiguration()
-        clientConfiguration.dataDelegate = self
-        let client = Client(spaceId: spaceId,
-                            accessToken: accessToken,
-                            clientConfiguration: clientConfiguration)
-
-        print("Writing sync JSON files to directory \(outputDirectoryPath)")
-
-        client.sync { [unowned self] (result: Result<SyncSpace>) in
-            guard let syncSpace = result.value, result.error == nil else {
-                completion(Result.error(result.error!))
-                return
-            }
-            guard self.shouldDownloadMediaFiles && syncSpace.assets.count > 0 else {
-                completion(Result.success(true))
-                return
-            }
-            var imageSaveErrorCount = 0
-            for asset in syncSpace.assets {
-
-                self.syncGroup.enter()
-                client.fetchData(for: asset).then { data in
-                    do {
-                        try self.saveData(data, for: asset)
-                        self.syncGroup.leave()
-                    } catch {
-                        // TODO: Log error
-                        imageSaveErrorCount += 1
-                        self.syncGroup.leave()
+    private func sync(client c: Client) -> Promise<SyncSpace> {
+        return Promise { promise in
+            c.sync { result in
+                guard let syncSpace = result.value else {
+                    if let error = result.error {
+                        promise.reject(error)
+                    } else {
+                        promise.reject(Error.failedToFetchSyncSpace)
                     }
-
-                }.error { error in
-                    completion(Result.error(error))
-                }
-            }
-            // Execute after all tasks have finished.
-            self.syncGroup.notify(queue: DispatchQueue.main) {
-                guard imageSaveErrorCount == 0 else {
-                    completion(Result.error(SyncJSONDownloader.Error.failedToWriteFiles(imageSaveErrorCount)))
                     return
                 }
-                completion(Result.success(true))
+                promise.fulfill(syncSpace)
             }
         }
     }
 
-    private let syncGroup: DispatchGroup
+    private func fetchAssets(withClient client: Client, syncSpace space: SyncSpace) -> Promise<Void> {
+        return Promise { promise in
+            if shouldDownloadMediaFiles == false || space.assets.isEmpty {
+                promise.fulfill(())
+                return
+            }
+            let syncGroup = DispatchGroup()
+            var imageSaveErrorCount = 0
+            for asset in space.assets {
+                syncGroup.enter()
+                client.fetchData(for: asset) { [unowned self] data in
+                    do {
+                        guard let fetched = data.value else {
+                            syncGroup.leave()
+                            return
+                        }
+                        try self.saveData(fetched, for: asset)
+                        syncGroup.leave()
+                    } catch {
+                        imageSaveErrorCount += 1
+                        syncGroup.leave()
+                        promise.reject(error)
+                    }
+                }
+            }
+            syncGroup.notify(queue: DispatchQueue.main) {
+                guard imageSaveErrorCount == 0 else {
+                    promise.reject(SyncJSONDownloader.Error.failedToWriteFiles(imageSaveErrorCount))
+                    return
+                }
+                promise.fulfill(())
+            }
+        }
+    }
+
+    private func fetchLocales(withClient client: Client) -> Promise<Void> {
+        return Promise { promise in
+            _ = client.fetch(url: client.url(endpoint: .locales)) { [unowned self] result in
+                guard let data = result.value, result.error == nil else {
+                    promise.reject(result.error!)
+                    return
+                }
+                self.handleDataFetchedAtURL(data, url: client.url(endpoint: .locales))
+                promise.fulfill(())
+            }
+        }
+    }
+
+    private func fetchSync(withClient client: Client, syncSpace: SyncSpace) -> Promise<Void> {
+        return Promise { promise in
+            let url = client.url(endpoint: .sync, parameters: syncSpace.parameters)
+            _ = client.fetch(url: url) { [unowned self] result in
+                guard let data = result.value, result.error == nil else {
+                    promise.reject(result.error!)
+                    return
+                }
+                self.handleDataFetchedAtURL(data, url: url)
+                let itinialUrl = client.url(endpoint: .sync, parameters: ["initial": "1"])
+                _ = client.fetch(url: itinialUrl, then: { initialResult in
+                    guard let data = initialResult.value, initialResult.error == nil else {
+                        promise.reject(initialResult.error!)
+                        return
+                    }
+                    self.handleDataFetchedAtURL(data, url: url)
+                    promise.fulfill(())
+                })
+            }
+        }
+    }
 
     private func saveData(_ data: Data, for asset: Asset) throws {
         // FIXME: Break into method on persistent thing.
         guard let fileName = SynchronizationManager.fileName(for: asset) else {
-            throw SDKError.invalidClient()
+            throw SDKError.localeHandlingError(message: "Filename not set")
         }
 
-
         guard let directoryURL = Foundation.URL(string: outputDirectoryPath) else {
-            throw SDKError.invalidClient()
+            throw SDKError.localeHandlingError(message: "Output directory path not exists")
         }
 
         let filePath = directoryURL.appendingPathComponent(fileName)
         guard FileManager.default.createFile(atPath: filePath.absoluteString, contents: data, attributes: nil) else {
-            throw SDKError.invalidClient()
+            throw SDKError.localeHandlingError(message: "Unable to create data at \(filePath.absoluteString)")
         }
     }
-
-    // MARK: DataDelegate
 
     public func handleDataFetchedAtURL(_ data: Data, url: URL) {
         saveJSONDataToDiskIfNecessary(data, for: url)
@@ -108,11 +154,11 @@ public final class SyncJSONDownloader: DataDelegate {
         // Compare components
         guard let fetchURLComponents = URLComponents(url: fetchURL, resolvingAgainstBaseURL: false) else { return }
 
-        switch fetchURLComponents.path {
+        switch fetchURL.lastPathComponent {
         // Write the space to disk.
-        case "/spaces/\(spaceId)/environments/master/locales":
+        case "locales":
             writeJSONDataToDisk(data, withFileName: "locales")
-        case "/spaces/\(spaceId)/sync":
+        case "sync":
             guard let fetchQueryItems = fetchURLComponents.queryItems else { return }
 
             for queryItem in fetchQueryItems {
@@ -132,7 +178,6 @@ public final class SyncJSONDownloader: DataDelegate {
     }
 
     private func writeJSONDataToDisk(_ data: Data, withFileName fileName: String) {
-
         let directoryURL = Foundation.URL(string: outputDirectoryPath)!
 
         let filePath = directoryURL.appendingPathComponent(fileName)
@@ -146,6 +191,6 @@ public extension SyncJSONDownloader {
         case invalidArguments
         case failedToCreateFile
         case failedToWriteFiles(Int)
-        // FIXME: Error messages.
+        case failedToFetchSyncSpace
     }
 }
