@@ -7,15 +7,12 @@
 //
 
 @testable import ContentfulSyncSerializer
-import XCTest
-import Foundation
 import Files
-
+import Foundation
+import XCTest
 
 class ContentfulSyncSerializerTests: XCTestCase {
-
     func testSavingJSONFilesToDirectory() {
-
         do {
             // Setup a temp test folder that can be used as a sandbox
             let tempFolder = Folder.temporary
@@ -37,7 +34,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
 
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
-            syncJSONDowloader.run() { result in
+            syncJSONDowloader.run { result in
                 guard let success = result.value, success == true else {
                     XCTAssert(false, "SyncJSONDownloader failed to sync json files with error: \(result.error!)")
                     expectation.fulfill()
@@ -56,13 +53,20 @@ class ContentfulSyncSerializerTests: XCTestCase {
         }
     }
 
-    func testSavingImageDataFilesToDirectory() {
+    func testSavingImageDataFilesToDirectoryWithSpace() {
+        saveImageData(toDirectory: "ContentfulSyncSerializerTests")
+    }
 
+    func testSavingImageDataFilesToDirectory() {
+        saveImageData(toDirectory: "ContentfulSyncSerializer Tests")
+    }
+
+    private func saveImageData(toDirectory name: String) {
         do {
             // Setup a temp test folder that can be used as a sandbox
             let tempFolder = Folder.temporary
             let testFolder = try tempFolder.createSubfolderIfNeeded(
-                withName: "ContentfulSyncSerializerTests"
+                withName: name
             )
             // Empty the test folder to ensure a clean state
             try testFolder.empty()
@@ -79,7 +83,7 @@ class ContentfulSyncSerializerTests: XCTestCase {
 
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
-            syncJSONDowloader.run() { result in
+            syncJSONDowloader.run { result in
                 guard let success = result.value, success == true else {
                     XCTAssert(false, "SyncJSONDownloader failed to sync json files")
                     expectation.fulfill()
@@ -101,4 +105,3 @@ class ContentfulSyncSerializerTests: XCTestCase {
         }
     }
 }
-
