@@ -54,11 +54,11 @@ class ContentfulSyncSerializerTests: XCTestCase {
     }
 
     func testSavingImageDataFilesToDirectoryWithSpace() {
-        saveImageData(toDirectory: "ContentfulSyncSerializerTests")
+        saveImageData(toDirectory: "ContentfulSyncSerializer Tests")
     }
 
     func testSavingImageDataFilesToDirectory() {
-        saveImageData(toDirectory: "ContentfulSyncSerializer Tests")
+        saveImageData(toDirectory: "ContentfulSyncSerializerTests")
     }
 
     private func saveImageData(toDirectory name: String) {
