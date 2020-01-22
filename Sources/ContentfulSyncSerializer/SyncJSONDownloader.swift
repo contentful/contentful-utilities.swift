@@ -1,13 +1,6 @@
-//
-//  BundleDatabaseCLI.swift
-//  ContentfulPersistence
-//
-//  Created by JP Wright on 07.09.17.
-//  Copyright © 2017 Contentful GmbH. All rights reserved.
-//
-
 import Contentful
 import ContentfulPersistence
+import Files
 import Foundation
 import PromiseKit
 public final class SyncJSONDownloader {
@@ -68,13 +61,13 @@ public final class SyncJSONDownloader {
             var imageSaveErrorCount = 0
             for asset in space.assets {
                 syncGroup.enter()
-                client.fetchData(for: asset) { [unowned self] data in
+                client.fetchData(for: asset) { [weak self] data in
                     do {
                         guard let fetched = data.value else {
                             syncGroup.leave()
                             return
                         }
-                        try self.saveData(fetched, for: asset)
+                        try self?.saveData(fetched, for: asset)
                         syncGroup.leave()
                     } catch {
                         imageSaveErrorCount += 1
@@ -95,13 +88,17 @@ public final class SyncJSONDownloader {
 
     private func fetchLocales(withClient client: Client) -> Promise<Void> {
         return Promise { promise in
-            _ = client.fetch(url: client.url(endpoint: .locales)) { [unowned self] result in
+            _ = client.fetch(url: client.url(endpoint: .locales)) { [weak self] result in
                 guard let data = result.value, result.error == nil else {
                     promise.reject(result.error!)
                     return
                 }
-                self.handleDataFetchedAtURL(data, url: client.url(endpoint: .locales))
-                promise.fulfill(())
+                do {
+                    try self?.handleDataFetchedAtURL(data, url: client.url(endpoint: .locales))
+                    promise.fulfill(())
+                } catch {
+                    promise.reject(error)
+                }
             }
         }
     }
@@ -114,15 +111,23 @@ public final class SyncJSONDownloader {
                     promise.reject(result.error!)
                     return
                 }
-                self.handleDataFetchedAtURL(data, url: url)
+                do {
+                    try self.handleDataFetchedAtURL(data, url: url)
+                } catch {
+                    promise.reject(error)
+                }
                 let itinialUrl = client.url(endpoint: .sync, parameters: ["initial": "1"])
                 _ = client.fetch(url: itinialUrl, then: { initialResult in
                     guard let data = initialResult.value, initialResult.error == nil else {
                         promise.reject(initialResult.error!)
                         return
                     }
-                    self.handleDataFetchedAtURL(data, url: url)
-                    promise.fulfill(())
+                    do {
+                        try self.handleDataFetchedAtURL(data, url: url)
+                        promise.fulfill(())
+                    } catch {
+                        promise.reject(error)
+                    }
                 })
             }
         }
@@ -133,42 +138,36 @@ public final class SyncJSONDownloader {
         guard let fileName = SynchronizationManager.fileName(for: asset) else {
             throw SDKError.localeHandlingError(message: "Filename not set")
         }
-
-        guard let directoryURL = Foundation.URL(string: outputDirectoryPath) else {
-            throw SDKError.localeHandlingError(message: "Output directory path not exists")
-        }
-
-        let filePath = directoryURL.appendingPathComponent(fileName)
-        guard FileManager.default.createFile(atPath: filePath.absoluteString, contents: data, attributes: nil) else {
-            throw SDKError.localeHandlingError(message: "Unable to create data at \(filePath.absoluteString)")
-        }
+        let folder = try Folder(path: outputDirectoryPath)
+        let file = try folder.createFile(named: fileName)
+        try file.write(data)
     }
 
-    public func handleDataFetchedAtURL(_ data: Data, url: URL) {
-        saveJSONDataToDiskIfNecessary(data, for: url)
+    public func handleDataFetchedAtURL(_ data: Data, url: URL) throws {
+        try saveJSONDataToDiskIfNecessary(data, for: url)
     }
 
     private var fileNameIndex: Int = 0
 
-    private func saveJSONDataToDiskIfNecessary(_ data: Data, for fetchURL: URL) {
+    private func saveJSONDataToDiskIfNecessary(_ data: Data, for fetchURL: URL) throws {
         // Compare components
         guard let fetchURLComponents = URLComponents(url: fetchURL, resolvingAgainstBaseURL: false) else { return }
 
         switch fetchURL.lastPathComponent {
         // Write the space to disk.
         case "locales":
-            writeJSONDataToDisk(data, withFileName: "locales")
+            try writeJSONDataToDisk(data, withFileName: "locales")
         case "sync":
             guard let fetchQueryItems = fetchURLComponents.queryItems else { return }
 
             for queryItem in fetchQueryItems {
                 // Store file for initial sync.
                 if let initial = queryItem.value, queryItem.name == "initial", initial == String(1) {
-                    writeJSONDataToDisk(data, withFileName: String(fileNameIndex))
+                    try writeJSONDataToDisk(data, withFileName: String(fileNameIndex))
                     fileNameIndex += 1
                 } else if queryItem.name == "sync_token" {
                     // Store JSON file for subsequent sync with syncToken as the name.
-                    writeJSONDataToDisk(data, withFileName: String(fileNameIndex))
+                    try writeJSONDataToDisk(data, withFileName: String(fileNameIndex))
                     fileNameIndex += 1
                 }
             }
@@ -177,12 +176,10 @@ public final class SyncJSONDownloader {
         }
     }
 
-    private func writeJSONDataToDisk(_ data: Data, withFileName fileName: String) {
-        let directoryURL = Foundation.URL(string: outputDirectoryPath)!
-
-        let filePath = directoryURL.appendingPathComponent(fileName)
-        let fullPath = filePath.appendingPathExtension("json")
-        FileManager.default.createFile(atPath: fullPath.absoluteString, contents: data, attributes: nil)
+    private func writeJSONDataToDisk(_ data: Data, withFileName fileName: String) throws {
+        let folder = try Folder(path: outputDirectoryPath)
+        let file = try folder.createFile(named: fileName + ".json")
+        try file.write(data)
     }
 }
 
