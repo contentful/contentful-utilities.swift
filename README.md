@@ -23,7 +23,7 @@ Now that the executable has compiled, `cd` in to the build directory and then co
 
 ```bash
 cd .build/release
-cp -f ContentfulUtilties /usr/local/bin/contentful-utilities
+cp -f ContentfulUtilities /usr/local/bin/contentful-utilities
 ```
 
 ## Usage
