@@ -41,7 +41,8 @@ let package = Package(
             name: "ContentfulSyncSerializer",
             dependencies: [
                 "ContentfulPersistence",
-				"PromiseKit"
+				"PromiseKit",
+				"Files"
             ]
         ),
         .testTarget(
