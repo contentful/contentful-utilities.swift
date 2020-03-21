@@ -27,8 +27,12 @@ class ContentfulSyncSerializerTests: XCTestCase {
             fileManager.changeCurrentDirectoryPath(testFolder.path)
 
             // Uses Complex Sync Test Space to check mulitpage sync. First argument is always working directory.
-            let syncJSONDowloader = SyncJSONDownloader(spaceId: "smf0sqiu0c5s",
-                                                       accessToken: "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34",
+//            let syncJSONDowloader = SyncJSONDownloader(spaceId: "smf0sqiu0c5s",
+//                                                       accessToken: "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34",
+//                                                       outputDirectoryPath: testFolder.path,
+//                                                       shouldDownloadMediaFiles: false)
+            let syncJSONDowloader = SyncJSONDownloader(spaceId: "6ow77euuv5h0",
+                                                       accessToken: "_dUozx-cUku0PL9gf0-1BGidEdIoqTsk1CEWipT_qdQ",
                                                        outputDirectoryPath: testFolder.path,
                                                        shouldDownloadMediaFiles: false)
 
@@ -41,8 +45,8 @@ class ContentfulSyncSerializerTests: XCTestCase {
                     return
                 }
                 XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "0.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "1.json"))
+                XCTAssertNotNil(try? testFolder.file(named: "entries.json"))
+//                XCTAssertNotNil(try? testFolder.file(named: "1.json"))
 
                 expectation.fulfill()
             }
@@ -90,11 +94,11 @@ class ContentfulSyncSerializerTests: XCTestCase {
                     return
                 }
                 XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "0.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "cache_1x0xpXu4pSGS4OukSyWGUK.jpg"))
-                XCTAssertNotNil(try? testFolder.file(named: "cache_happycat.jpg"))
-                XCTAssertNotNil(try? testFolder.file(named: "cache_jake.png"))
-                XCTAssertNotNil(try? testFolder.file(named: "cache_nyancat.png"))
+                XCTAssertNotNil(try? testFolder.file(named: "entries.json"))
+                XCTAssertNotNil(try? testFolder.file(named: "doge.jpg"))
+                XCTAssertNotNil(try? testFolder.file(named: "happycatw.jpg"))
+                XCTAssertNotNil(try? testFolder.file(named: "jake.png"))
+                XCTAssertNotNil(try? testFolder.file(named: "Nyan_cat_250px_frame.png"))
 
                 expectation.fulfill()
             }
