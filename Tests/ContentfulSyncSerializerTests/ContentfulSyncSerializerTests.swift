@@ -27,12 +27,8 @@ class ContentfulSyncSerializerTests: XCTestCase {
             fileManager.changeCurrentDirectoryPath(testFolder.path)
 
             // Uses Complex Sync Test Space to check mulitpage sync. First argument is always working directory.
-//            let syncJSONDowloader = SyncJSONDownloader(spaceId: "smf0sqiu0c5s",
-//                                                       accessToken: "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34",
-//                                                       outputDirectoryPath: testFolder.path,
-//                                                       shouldDownloadMediaFiles: false)
-            let syncJSONDowloader = SyncJSONDownloader(spaceId: "6ow77euuv5h0",
-                                                       accessToken: "_dUozx-cUku0PL9gf0-1BGidEdIoqTsk1CEWipT_qdQ",
+            let syncJSONDowloader = SyncJSONDownloader(spaceId: "smf0sqiu0c5s",
+                                                       accessToken: "14d305ad526d4487e21a99b5b9313a8877ce6fbf540f02b12189eea61550ef34",
                                                        outputDirectoryPath: testFolder.path,
                                                        shouldDownloadMediaFiles: false)
 
