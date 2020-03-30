@@ -1,5 +1,4 @@
 import Contentful
-import ContentfulPersistence
 import Files
 import Foundation
 import PromiseKit
@@ -67,7 +66,7 @@ public final class SyncJSONDownloader {
                             syncGroup.leave()
                             return
                         }
-                        try self?.saveData(fetched, for: asset)
+                        try self?.saveData(fetched, for: asset.file?.fileName)
                         syncGroup.leave()
                     } catch {
                         imageSaveErrorCount += 1
@@ -89,12 +88,12 @@ public final class SyncJSONDownloader {
     private func fetchLocales(withClient client: Client) -> Promise<Void> {
         return Promise { promise in
             _ = client.fetch(url: client.url(endpoint: .locales)) { [weak self] result in
-                guard let data = result.value, result.error == nil else {
+                guard let self = self, let data = result.value, result.error == nil else {
                     promise.reject(result.error!)
                     return
                 }
                 do {
-                    try self?.handleDataFetchedAtURL(data, url: client.url(endpoint: .locales))
+                    try self.writeJSONDataToDisk(data, withFileName: "locales")
                     promise.fulfill(())
                 } catch {
                     promise.reject(error)
@@ -105,75 +104,21 @@ public final class SyncJSONDownloader {
 
     private func fetchSync(withClient client: Client, syncSpace: SyncSpace) -> Promise<Void> {
         return Promise { promise in
-            let url = client.url(endpoint: .sync, parameters: syncSpace.parameters)
-            _ = client.fetch(url: url) { [unowned self] result in
-                guard let data = result.value, result.error == nil else {
-                    promise.reject(result.error!)
-                    return
-                }
-                do {
-                    try self.handleDataFetchedAtURL(data, url: url)
-                } catch {
-                    promise.reject(error)
-                }
-                let itinialUrl = client.url(endpoint: .sync, parameters: ["initial": "1"])
-                _ = client.fetch(url: itinialUrl, then: { initialResult in
-                    guard let data = initialResult.value, initialResult.error == nil else {
-                        promise.reject(initialResult.error!)
-                        return
-                    }
-                    do {
-                        try self.handleDataFetchedAtURL(data, url: url)
-                        promise.fulfill(())
-                    } catch {
-                        promise.reject(error)
-                    }
-                })
+            do {
+                let data = try JSONEncoder().encode(syncSpace.entries)
+                try writeJSONDataToDisk(data, withFileName: "entries")
+                promise.fulfill(())
+            } catch {
+                promise.reject(error)
             }
         }
     }
 
-    private func saveData(_ data: Data, for asset: Asset) throws {
-        // FIXME: Break into method on persistent thing.
-        guard let fileName = SynchronizationManager.fileName(for: asset) else {
-            throw SDKError.localeHandlingError(message: "Filename not set")
-        }
+    private func saveData(_ data: Data, for fileName: String?) throws {
+        guard let fileName = fileName else { return }
         let folder = try Folder(path: outputDirectoryPath)
         let file = try folder.createFile(named: fileName)
         try file.write(data)
-    }
-
-    public func handleDataFetchedAtURL(_ data: Data, url: URL) throws {
-        try saveJSONDataToDiskIfNecessary(data, for: url)
-    }
-
-    private var fileNameIndex: Int = 0
-
-    private func saveJSONDataToDiskIfNecessary(_ data: Data, for fetchURL: URL) throws {
-        // Compare components
-        guard let fetchURLComponents = URLComponents(url: fetchURL, resolvingAgainstBaseURL: false) else { return }
-
-        switch fetchURL.lastPathComponent {
-        // Write the space to disk.
-        case "locales":
-            try writeJSONDataToDisk(data, withFileName: "locales")
-        case "sync":
-            guard let fetchQueryItems = fetchURLComponents.queryItems else { return }
-
-            for queryItem in fetchQueryItems {
-                // Store file for initial sync.
-                if let initial = queryItem.value, queryItem.name == "initial", initial == String(1) {
-                    try writeJSONDataToDisk(data, withFileName: String(fileNameIndex))
-                    fileNameIndex += 1
-                } else if queryItem.name == "sync_token" {
-                    // Store JSON file for subsequent sync with syncToken as the name.
-                    try writeJSONDataToDisk(data, withFileName: String(fileNameIndex))
-                    fileNameIndex += 1
-                }
-            }
-        default:
-            return
-        }
     }
 
     private func writeJSONDataToDisk(_ data: Data, withFileName fileName: String) throws {

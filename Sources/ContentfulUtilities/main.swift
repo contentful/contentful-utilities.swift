@@ -18,12 +18,12 @@ let bundleSyncCommand = command(
     Option<String>("output", default: "", description: "The path to the directory for your output"),
     Option<String>("environment", default: "master", description: "The identifier for your Contentful environment. If value is not specified, master will be used as default"),
     Flag("download-asset-data", default: false, description: "If true, downloads the binary media files as well")
-) { (spaceId: String, accessToken: String, output: String,environment:String, shouldDownloadMediaFiles: Bool) in
+) { (spaceId: String, accessToken: String, output: String, environment: String, shouldDownloadMediaFiles: Bool) in
 
     let syncJSONDownloader = SyncJSONDownloader(spaceId: spaceId,
                                                 accessToken: accessToken,
                                                 outputDirectoryPath: output,
-                                                environment:environment,
+                                                environment: environment,
                                                 shouldDownloadMediaFiles: shouldDownloadMediaFiles)
 
     syncJSONDownloader.run { result in
