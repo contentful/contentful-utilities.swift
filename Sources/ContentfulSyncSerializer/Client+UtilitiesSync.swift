@@ -73,7 +73,7 @@ extension Client {
                     completion(.failure(error))
                 }
 
-            case .error(let error):
+            case .failure(let error):
                 completion(.failure(error))
             }
         }
@@ -108,7 +108,7 @@ extension Client {
                     completion: completion
                 )
 
-            case .error(let error):
+            case .failure(let error):
                 completion(.failure(error))
             }
         }

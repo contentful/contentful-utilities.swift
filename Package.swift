@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/contentful/contentful.swift",
-            .upToNextMajor(from: "5.0.9")),
+            .upToNextMajor(from: "5.3.0")),
         .package(
             url: "https://github.com/kylef/Commander",
             .upToNextMajor(from: "0.9.1")),

@@ -35,16 +35,17 @@ class ContentfulSyncSerializerTests: XCTestCase {
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
             syncJSONDowloader.run { result in
-                guard let success = result.value, success == true else {
-                    XCTAssert(false, "SyncJSONDownloader failed to sync json files with error: \(result.error!)")
+                switch result {
+                case .success:
+                    XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
+                    XCTAssertNotNil(try? testFolder.file(named: "0.json"))
+                    XCTAssertNotNil(try? testFolder.file(named: "1.json"))
                     expectation.fulfill()
-                    return
+                    
+                case .failure(let error):
+                    XCTAssert(false, "SyncJSONDownloader failed to sync json files with error: \(error)")
+                    expectation.fulfill()
                 }
-                XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "entries.json"))
-//                XCTAssertNotNil(try? testFolder.file(named: "1.json"))
-
-                expectation.fulfill()
             }
             waitForExpectations(timeout: 10.0, handler: nil)
             try testFolder.delete()
@@ -84,19 +85,20 @@ class ContentfulSyncSerializerTests: XCTestCase {
             let expectation = self.expectation(description: "Will download JSON files")
             // syncJSONDowloader the tool and assert that the file was created
             syncJSONDowloader.run { result in
-                guard let success = result.value, success == true else {
+                switch result {
+                case .success:
+                    XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
+                    XCTAssertNotNil(try? testFolder.file(named: "0.json"))
+                    XCTAssertNotNil(try? testFolder.file(named: "doge.jpg"))
+                    XCTAssertNotNil(try? testFolder.file(named: "happycatw.jpg"))
+                    XCTAssertNotNil(try? testFolder.file(named: "jake.png"))
+                    XCTAssertNotNil(try? testFolder.file(named: "Nyan_cat_250px_frame.png"))
+                    expectation.fulfill()
+
+                case .failure:
                     XCTAssert(false, "SyncJSONDownloader failed to sync json files")
                     expectation.fulfill()
-                    return
                 }
-                XCTAssertNotNil(try? testFolder.file(named: "locales.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "entries.json"))
-                XCTAssertNotNil(try? testFolder.file(named: "doge.jpg"))
-                XCTAssertNotNil(try? testFolder.file(named: "happycatw.jpg"))
-                XCTAssertNotNil(try? testFolder.file(named: "jake.png"))
-                XCTAssertNotNil(try? testFolder.file(named: "Nyan_cat_250px_frame.png"))
-
-                expectation.fulfill()
             }
             waitForExpectations(timeout: 10.0, handler: nil)
             try testFolder.delete()

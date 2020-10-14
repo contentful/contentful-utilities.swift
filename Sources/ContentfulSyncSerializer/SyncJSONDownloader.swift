@@ -26,7 +26,7 @@ public final class SyncJSONDownloader {
         self.shouldDownloadMediaFiles = shouldDownloadMediaFiles
     }
 
-    public func run(then completion: @escaping (Contentful.Result<Bool>) -> Void) {
+    public func run(then completion: @escaping (Swift.Result<Bool, Swift.Error>) -> Void) {
         self.entriesFileNameIndex = 0
 
         let client = Client(
@@ -44,22 +44,19 @@ public final class SyncJSONDownloader {
         }.done { _ in
             completion(.success(true))
         }.catch { error in
-            completion(.error(error))
+            completion(.failure(error))
         }
     }
 
     private func sync(client c: Client) -> Promise<SyncSpace> {
         return Promise { promise in
             c.sync { result in
-                guard let syncSpace = result.value else {
-                    if let error = result.error {
-                        promise.reject(error)
-                    } else {
-                        promise.reject(Error.failedToFetchSyncSpace)
-                    }
-                    return
+                switch result {
+                case .success(let syncSpace):
+                    promise.fulfill(syncSpace)
+                case .failure(let error):
+                    promise.reject(error)
                 }
-                promise.fulfill(syncSpace)
             }
         }
     }
@@ -67,14 +64,20 @@ public final class SyncJSONDownloader {
     private func fetchLocales(withClient client: Client) -> Promise<Void> {
         return Promise { promise in
             _ = client.fetch(url: client.url(endpoint: .locales)) { [weak self] result in
-                guard let self = self, let data = result.value, result.error == nil else {
-                    promise.reject(result.error!)
+                guard let self = self else {
+                    promise.reject(SyncJSONDownloader.Error.clientNotAvailable)
                     return
                 }
-                do {
-                    try self.writeJSONDataToDisk(data, withFileName: "locales")
-                    promise.fulfill(())
-                } catch {
+
+                switch result {
+                case .success(let data):
+                    do {
+                        try self.writeJSONDataToDisk(data, withFileName: "locales")
+                        promise.fulfill(())
+                    } catch let error {
+                        promise.reject(error)
+                    }
+                case .failure(let error):
                     promise.reject(error)
                 }
             }
