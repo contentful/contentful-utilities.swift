@@ -32,7 +32,7 @@ let bundleSyncCommand = command(
             print("Successfully stored JSON files for sync operation in directory \(CommandLine.arguments[3])")
             print("Add this directory to your bundle to ensure these files can be used by contentful-persistence.swift")
             exit(0)
-        case let .error(error):
+        case let .failure(error):
             print("Oh no! An error occurred: \(error)")
             exit(1)
         }
