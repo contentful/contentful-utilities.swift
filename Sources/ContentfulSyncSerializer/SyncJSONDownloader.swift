@@ -11,19 +11,22 @@ public final class SyncJSONDownloader {
     private let shouldDownloadMediaFiles: Bool
     private let environment: String
     private var entriesFileNameIndex: Int = 0
+    private let syncLimit: Int?
 
     public init(
         spaceId: String,
         accessToken: String,
         outputDirectoryPath: String,
         environment: String = "master",
-        shouldDownloadMediaFiles: Bool
+        shouldDownloadMediaFiles: Bool,
+        syncLimit: Int? = nil
     ) {
         self.spaceId = spaceId
         self.environment = environment
         self.accessToken = accessToken
         self.outputDirectoryPath = outputDirectoryPath
         self.shouldDownloadMediaFiles = shouldDownloadMediaFiles
+        self.syncLimit = syncLimit
     }
 
     public func run(then completion: @escaping (Swift.Result<Bool, Swift.Error>) -> Void) {
@@ -38,10 +41,10 @@ public final class SyncJSONDownloader {
         firstly {
             self.sync(client: client)
         }.then { _ in
-            self.fetchLocales(withClient: client).map({ SyncSpace() })
+            self.fetchLocales(withClient: client).map({ SyncSpace(limit: self.syncLimit) })
         }.then { syncSpace in
-            self.fetchContent(withClient: client, syncSpace: syncSpace).map({ SyncSpace() })
-        }.done { _ in
+            self.fetchContent(withClient: client, syncSpace: syncSpace)
+        }.done {
             completion(.success(true))
         }.catch { error in
             completion(.failure(error))
