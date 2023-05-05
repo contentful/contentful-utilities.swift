@@ -17,14 +17,16 @@ let bundleSyncCommand = command(
     Option<String>("access-token", default: "", description: "Your content delivery API access token"),
     Option<String>("output", default: "", description: "The path to the directory for your output"),
     Option<String>("environment", default: "master", description: "The identifier for your Contentful environment. If value is not specified, master will be used as default"),
-    Flag("download-asset-data", default: false, description: "If true, downloads the binary media files as well")
-) { (spaceId: String, accessToken: String, output: String, environment: String, shouldDownloadMediaFiles: Bool) in
+    Flag("download-asset-data", default: false, description: "If true, downloads the binary media files as well"),
+    Option<Int>("syncLimit", default: 500, description: "Number of entities per page in a sync operation. Defaulted to 500, max 1000. Reduces amount of json files outputted.")
+) { (spaceId: String, accessToken: String, output: String, environment: String, shouldDownloadMediaFiles: Bool, syncLimit: Int) in
 
     let syncJSONDownloader = SyncJSONDownloader(spaceId: spaceId,
                                                 accessToken: accessToken,
                                                 outputDirectoryPath: output,
                                                 environment: environment,
-                                                shouldDownloadMediaFiles: shouldDownloadMediaFiles)
+                                                shouldDownloadMediaFiles: shouldDownloadMediaFiles,
+                                                syncLimit: syncLimit)
 
     syncJSONDownloader.run { result in
         switch result {
